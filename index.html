@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>David Choi — Same obsessions, bigger stages.</title>
+  <meta name="description" content="A 10-minute personal intro. Same obsessions, bigger stages." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,0..100;1,9..144,300..900,0..100&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Fixed grain overlay — gives the whole page filmic atmosphere -->
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- SVG defs reused across scenes (noise, glow) -->
+  <svg class="svg-defs" aria-hidden="true" width="0" height="0">
+    <defs>
+      <filter id="noise">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/>
+        <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0   0 0 0 0.08 0"/>
+      </filter>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur" />
+        <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+      </filter>
+    </defs>
+  </svg>
+
+  <main id="scroller">
+
+    <!-- =========================================================
+         SCENE 01 — COLD OPEN
+         Layout: full-bleed bg (Korea-era photo). Year marker top-right,
+         title bottom-left, subtitle offset. Editorial magazine cover.
+         ========================================================= -->
+    <section class="scene scene--bleed scene--01" id="scene-01" data-scene="01">
+      <div class="scene__bg" data-bg="images/01-korea-david.jpg"></div>
+      <div class="scene__vignette"></div>
+      <div class="scene__layout scene__layout--cover">
+        <div class="ornament ornament--top-right">
+          <span class="mark">1999 · Seoul → Atlanta</span>
+        </div>
+        <div class="stack stack--bottom-left">
+          <h1 class="display">This is me,<br/>twenty years ago.</h1>
+          <p class="lede">I've been obsessed with four things ever since.<br/>
+            <span class="faint">Three of them still matter.</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SCENE 02 — THE CHOIS
+         Layout: editorial list, left-aligned, narrow column, breathing room.
+         ========================================================= -->
+    <section class="scene scene--02" id="scene-02" data-scene="02">
+      <div class="scene__layout scene__layout--column">
+        <span class="mark">Chapter i · the family</span>
+        <h2 class="display display--md">The Chois.</h2>
+        <dl class="editorial-list">
+          <div>
+            <dt>Dad</dt>
+            <dd>Henderson High → Georgia Tech.</dd>
+          </div>
+          <div>
+            <dt>Mom</dt>
+            <dd>Translator, then CPA, then taking the bar in June.</dd>
+          </div>
+          <div>
+            <dt>Sister</dt>
+            <dd>Carnegie Mellon → draws StubHub stage maps.</dd>
+          </div>
+        </dl>
+        <p class="aside">The overachiever gene skipped me.</p>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SCENE 03 — OBSESSION #1: Soccer + Michael
+         Layout: split 2/3 photo right, title left. Callback overlay.
+         ========================================================= -->
+    <section class="scene scene--03" id="scene-03" data-scene="03">
+      <div class="scene__layout scene__layout--split">
+        <div class="split__text">
+          <span class="mark mark--soccer">Obsession 01 · Soccer</span>
+          <h2 class="display display--sm">I played with this kid.</h2>
+        </div>
+        <div class="split__media" data-bg="images/03-young-mike-david.jpg">
+          <span class="reveal-caption">Yeah. <em>That</em> Michael McGovern.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SCENE 04 — OBSESSION #2: Dumb videos
+         Layout: centered video, no setup. Let the clip work.
+         ========================================================= -->
+    <section class="scene scene--04" id="scene-04" data-scene="04">
+      <div class="scene__layout scene__layout--center-tight">
+        <span class="mark mark--camera">Obsession 02 · The camera</span>
+        <h2 class="display display--md">Making dumb videos<br/>with my friends.</h2>
+        <div class="video-frame" data-video="images/04-kid-videos.mp4"></div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SCENE 05 — UCLA + basketball joke
+         Layout: asymmetric. Big 'Statistics.' offset, team photo right,
+         joke pops as hand-feeling caption over the photo.
+         ========================================================= -->
+    <section class="scene scene--05" id="scene-05" data-scene="05">
+      <div class="scene__layout scene__layout--asymmetric">
+        <div class="offset-left">
+          <span class="mark">2016 · UCLA</span>
+          <h2 class="display">Statistics.</h2>
+          <p class="lede">And I played basketball.</p>
+        </div>
+        <div class="offset-right" data-bg="images/05-ucla-team.jpg">
+          <span class="reveal-caption reveal-caption--handwritten">
+            I did not play basketball.
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SCENE 06 — AI ACCIDENT I
+         Layout: editorial, dense type-only. Narrow left-aligned column.
+         ========================================================= -->
+    <section class="scene scene--06" id="scene-06" data-scene="06">
+      <div class="scene__layout scene__layout--column">
+        <span class="mark mark--ai">2021 · first job</span>
+        <h2 class="display display--md">Selling AI.<br/>Pre-ChatGPT.</h2>
+        <p class="lede">Imagine trying to sell people AI in 2021.</p>
+        <p class="aside">I walked so you all could run.</p>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SCENE 07 — AI ACCIDENT II: ChatGPT drops
+         Layout: timeline ticker. Beat-drop moment.
+         ========================================================= -->
+    <section class="scene scene--07" id="scene-07" data-scene="07">
+      <div class="scene__layout scene__layout--center-wide">
+        <div class="ticker" data-years="2020,2021,2022,Nov 30 · 2022">
+          <span class="ticker__value">2020</span>
+        </div>
+        <h2 class="display">ChatGPT drops.</h2>
+        <p class="lede">I was at a family office, modeling with it<br/>before anyone else on my floor.</p>
+        <p class="aside">That's when I realized I'd been early to something by accident.</p>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SCENE 08 — CREATOR LIFE
+         Layout: split. Text left, video right. @mikemcgovern era.
+         ========================================================= -->
+    <section class="scene scene--08" id="scene-08" data-scene="08">
+      <div class="scene__layout scene__layout--split scene__layout--split-reverse">
+        <div class="split__text">
+          <span class="mark mark--camera">Obsession 03 · grown up</span>
+          <h2 class="display display--sm">Started editing seriously.</h2>
+          <p class="lede">Built <em>@mikemcgovern</em> with Michael.<br/>Then ran MrBeast's Instagram for a minute.</p>
+          <p class="aside">Mostly I learned that Greenville, NC is a place.</p>
+        </div>
+        <div class="split__media split__media--video" data-video="images/08-mikemcgovern-reel.mp4"></div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SCENE 09 — FULL CIRCLE
+         Layout: full-bleed photo of present-day David + Michael.
+         Single line overlay bottom.
+         ========================================================= -->
+    <section class="scene scene--bleed scene--09" id="scene-09" data-scene="09">
+      <div class="scene__bg" data-bg="images/09-david-mike-present.jpg"></div>
+      <div class="scene__vignette"></div>
+      <div class="scene__layout scene__layout--cover">
+        <div class="stack stack--bottom-left">
+          <span class="mark">2026 · back home</span>
+          <h2 class="display">Back to Atlanta.<br/>Back to Michael.</h2>
+          <p class="lede faint">Now I work with him.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SCENE 10 — JAZ
+         Layout: full-bleed photo. One word. Restraint.
+         ========================================================= -->
+    <section class="scene scene--bleed scene--10" id="scene-10" data-scene="10">
+      <div class="scene__bg" data-bg="images/10-jaz.jpg"></div>
+      <div class="scene__vignette scene__vignette--soft"></div>
+      <div class="scene__layout scene__layout--cover">
+        <div class="stack stack--bottom-left">
+          <span class="mark mark--jaz">Obsession 04</span>
+          <h2 class="display">Jazmin.</h2>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SCENE 11 — THREAD CONVERGENCE (pinned, 3-phase)
+         A: threads weave + converge
+         B: particle burst (canvas)
+         C: map reveal → zoom through ATL node → present-day photo
+         ========================================================= -->
+    <section class="scene scene--bleed scene--11" id="scene-11" data-scene="11">
+      <div class="scene__inner scene__inner--full">
+        <svg class="threads" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <path class="thread thread--soccer" d="M -50 120 C 300 120, 500 400, 600 400" />
+          <path class="thread thread--camera" d="M 1250 220 C 900 220, 700 400, 600 400" />
+          <path class="thread thread--ai"     d="M -50 680 C 300 680, 500 400, 600 400" />
+          <path class="thread thread--jaz"    d="M 1250 580 C 900 580, 700 400, 600 400" />
+        </svg>
+        <canvas class="burst" aria-hidden="true"></canvas>
+        <div class="map-layer" aria-hidden="true"></div>
+        <div class="thread-labels">
+          <span class="thread-label thread-label--soccer">soccer</span>
+          <span class="thread-label thread-label--camera">the camera</span>
+          <span class="thread-label thread-label--ai">stats &amp; ai</span>
+          <span class="thread-label thread-label--jaz">jaz</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SCENE 12 — CLOSER
+         Layout: four obsessions stacked, left-aligned, huge.
+         Closer line in serif italic below.
+         ========================================================= -->
+    <section class="scene scene--12" id="scene-12" data-scene="12">
+      <div class="scene__layout scene__layout--closer">
+        <ul class="obsessions">
+          <li><span class="obsessions__num">01</span>Jaz.</li>
+          <li><span class="obsessions__num">02</span>Creator stuff.</li>
+          <li><span class="obsessions__num">03</span>Soccer.</li>
+          <li><span class="obsessions__num">04</span>Travel.</li>
+        </ul>
+        <p class="closer">Same obsessions, <em>bigger stages.</em><br/>
+          <span class="closer__kicker">Haven't had an original thought since 1999.</span>
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Libs via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
