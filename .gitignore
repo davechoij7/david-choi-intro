@@ -4,3 +4,10 @@ node_modules/
 *.log
 .env
 .env.local
+
+# Debug screenshots from life-thread tuning
+lt-*.png
+
+# MCP / tooling artifacts
+.playwright-mcp/
+.claude/

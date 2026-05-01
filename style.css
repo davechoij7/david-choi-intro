@@ -423,53 +423,129 @@ body { overscroll-behavior: none; }
 .ticker__value::before { content: '› '; color: var(--c-ai); }
 
 /* ------------------------------------------------------------
-   Scene 11 — threads
+   Scene 11 — 3-thread split → converge → neural blast → map
    ------------------------------------------------------------ */
-.scene--11 { background: oklch(0.08 0.008 var(--hue)); height: 100vh; }
+.scene--11 { background: oklch(0.05 0.008 var(--hue)); height: 100vh; }
 
-.scene__inner--full { width: 100%; height: 100%; position: relative; }
+.scene__inner--full {
+  width: 100%; height: 100%;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
 
 .threads {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
   pointer-events: none;
+  z-index: 2;
 }
 
 .thread {
   fill: none;
-  stroke-width: 2;
+  stroke-width: 2.5;
   stroke-linecap: round;
-  stroke-dasharray: 2000;
-  stroke-dashoffset: 2000;
-  filter: url(#glow);
+  stroke-linejoin: round;
+  opacity: 0.92;
 }
 
 .thread--soccer { stroke: var(--c-soccer); }
 .thread--camera { stroke: var(--c-camera); }
 .thread--ai     { stroke: var(--c-ai); }
-.thread--jaz    { stroke: var(--c-jaz); }
 
-.thread-labels { position: absolute; inset: 0; pointer-events: none; }
+.thread-labels {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
 
 .thread-label {
   position: absolute;
   font-family: var(--f-mono);
-  font-size: 0.8rem;
-  letter-spacing: 0.22em;
+  font-size: 0.78rem;
+  letter-spacing: 0.24em;
   text-transform: lowercase;
   font-weight: 500;
   opacity: 0;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
 }
 
-.thread-label--soccer { top: 12%;    left: 4%;  color: var(--c-soccer); }
-.thread-label--camera { top: 24%;    right: 4%; color: var(--c-camera); }
-.thread-label--ai     { bottom: 18%; left: 4%;  color: var(--c-ai); }
-.thread-label--jaz    { bottom: 28%; right: 4%; color: var(--c-jaz); }
+/* Label positions align with each arc's apex (viewBox 1200x800, preserveAspectRatio=slice).
+   Apex coords: soccer (80, 380) · camera (1120, 380) · AI (600, 720).
+   As %: soccer (6.7%, 47.5%) · camera (93.3%, 47.5%) · AI (50%, 90%). */
+.thread-label--soccer { left: 7%;   top: 47.5%; color: var(--c-soccer); }
+.thread-label--camera { left: 93%;  top: 47.5%; color: var(--c-camera); }
+.thread-label--ai     { left: 50%;  top: 90%;   color: var(--c-ai); }
 
-.burst { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; }
-.map-layer { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+/* Knot — the convergence point where the 3 threads meet, before the blast. */
+.knot {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: oklch(0.96 0.160 75);
+  box-shadow: 0 0 24px oklch(0.90 0.160 75 / 0.8),
+              0 0 64px oklch(0.85 0.160 75 / 0.4);
+  transform: translate(-50%, -50%) scale(0);
+  z-index: 4;
+  pointer-events: none;
+}
+
+/* Neural blast — canvas draws nodes + edges fanning out from the knot. */
+.neural-blast {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 5;
+}
+
+/* Map reveal — cities + dotted route. */
+.map-layer {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 6;
+}
+
+.map-route {
+  fill: none;
+  stroke: oklch(0.85 0.120 75 / 0.7);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-dasharray: 4 7;
+}
+
+.map-city { opacity: 0; }
+
+.map-halo {
+  fill: oklch(0.90 0.140 75 / 0.08);
+  stroke: oklch(0.85 0.140 75 / 0.35);
+  stroke-width: 0.6;
+}
+
+.map-dot { fill: oklch(0.95 0.160 75); }
+
+.map-label {
+  font-family: var(--f-mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  fill: oklch(0.94 0.03 var(--hue));
+  text-anchor: middle;
+}
+
+.map-sub {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: lowercase;
+  fill: oklch(0.72 0.02 var(--hue));
+  text-anchor: middle;
+}
 
 /* ------------------------------------------------------------
    Scene 12 — closer
@@ -478,7 +554,24 @@ body { overscroll-behavior: none; }
   list-style: none;
   display: grid;
   gap: 0.5vw;
-  margin-bottom: var(--s-7);
+  margin-bottom: var(--s-4);
+}
+
+.obsessions__addendum {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--fg-muted);
+  margin: 0 0 var(--s-7) 0;
+  padding-left: calc(3rem + 1.5rem); /* align with obsession text past num column */
+  font-variation-settings: 'opsz' 96, 'SOFT' 60;
+}
+
+.obsessions__addendum em {
+  font-style: italic;
+  color: var(--c-jaz);
 }
 
 .obsessions li {
@@ -561,4 +654,337 @@ body { overscroll-behavior: none; }
 :focus-visible {
   outline: 2px solid var(--c-camera);
   outline-offset: 4px;
+}
+
+/* ============================================================
+   PERSISTENT THROUGH-LINE
+   Fixed left-edge spine. Progress fill grows with scroll.
+   Colored segments light as each obsession scene enters.
+   ============================================================ */
+
+.through-line {
+  position: fixed;
+  left: clamp(18px, 2.4vw, 36px);
+  top: 0;
+  bottom: 0;
+  width: 16px;
+  z-index: 90;
+  pointer-events: none;
+  transition: opacity 0.8s var(--ease-enter);
+}
+
+.through-line__base {
+  position: absolute;
+  top: 10vh;
+  bottom: 10vh;
+  left: 7px;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--rule) 8%,
+    var(--rule) 92%,
+    transparent
+  );
+}
+
+.through-line__progress {
+  position: absolute;
+  top: 10vh;
+  left: 6px;
+  width: 2px;
+  height: 0;
+  background: linear-gradient(
+    to bottom,
+    oklch(0.95 0.015 var(--hue) / 0.1),
+    var(--fg-muted) 40%,
+    var(--fg)
+  );
+  will-change: height;
+}
+
+.through-line__head {
+  position: absolute;
+  top: 10vh;
+  left: 3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--fg);
+  box-shadow: 0 0 18px var(--fg), 0 0 4px var(--fg);
+  transform: translateY(0);
+  will-change: transform;
+}
+
+.segment {
+  position: absolute;
+  left: 3px;
+  width: 8px;
+  height: 56px;
+  border-radius: 4px;
+  opacity: 0.14;
+  filter: saturate(0.3);
+  transition:
+    opacity 0.9s var(--ease-enter),
+    filter 0.9s var(--ease-enter),
+    box-shadow 0.9s var(--ease-enter);
+}
+
+.segment.lit {
+  opacity: 1;
+  filter: saturate(1);
+}
+
+.segment--soccer { background: var(--c-soccer); }
+.segment--camera { background: var(--c-camera); }
+.segment--ai     { background: var(--c-ai); }
+.segment--jaz    { background: var(--c-jaz); }
+
+.segment.lit.segment--soccer { box-shadow: 0 0 24px -4px var(--c-soccer); }
+.segment.lit.segment--camera { box-shadow: 0 0 24px -4px var(--c-camera); }
+.segment.lit.segment--ai     { box-shadow: 0 0 24px -4px var(--c-ai); }
+.segment.lit.segment--jaz    { box-shadow: 0 0 24px -4px var(--c-jaz); }
+
+.through-line.is-hidden { opacity: 0; }
+
+@media (max-width: 640px) {
+  .through-line { display: none; }
+}
+
+/* ============================================================
+   SCENE 01 — Seoul → Atlanta pinned map zoom
+   SVG viewBox animates via JS across 3 phases.
+   ============================================================ */
+
+.map-01 {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.map-01 svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.map-01__route {
+  fill: none;
+  stroke: var(--c-camera);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 5;
+  stroke-dashoffset: 1800;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+.map-01__dot  { fill: var(--fg); }
+.map-01__halo { fill: none; stroke-width: 1; stroke: var(--fg); opacity: 0; }
+
+.map-01__label,
+.map-01__sub {
+  font-family: var(--f-mono);
+  fill: var(--fg);
+  opacity: 0;
+}
+.map-01__label { font-size: 11px; letter-spacing: 0.32em; font-weight: 500; }
+.map-01__sub   { font-size: 9px;  letter-spacing: 0.25em; fill: var(--fg-dim); }
+
+/* When the map phase finishes and the photo takes over, darken the map */
+.scene--01.is-map-fading .map-01 { opacity: 0.25; }
+
+/* ============================================================
+   SCENE 03 — young → present Michael crossfade
+   Two stacked image layers; present layer scrubs opacity 0→1.
+   ============================================================ */
+
+.split__media--crossfade { position: relative; overflow: hidden; background: var(--bg-soft); }
+
+.crossfade-layer {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--bg-soft);
+}
+
+.crossfade-layer--young   { opacity: 1; }
+.crossfade-layer--present { opacity: 0; will-change: opacity; }
+
+.split__media--crossfade .reveal-caption { z-index: 3; }
+
+/* ============================================================
+   SCENE 07 — ticker emphasis on the final beat
+   ============================================================ */
+
+.ticker__value {
+  display: inline-block;
+  transition:
+    color 0.4s var(--ease-enter),
+    text-shadow 0.4s var(--ease-enter),
+    transform 0.4s var(--ease-enter);
+}
+
+.ticker.is-beat .ticker__value {
+  color: var(--c-ai);
+  text-shadow: 0 0 28px oklch(0.68 0.12 240 / 0.55);
+  transform: scale(1.08);
+}
+
+/* ============================================================
+   LIFE THREAD — the through-line in the canvas
+   Spans the entire document height. One SVG path, scrubbed.
+   mix-blend-mode: screen so it reads as light over dark photos
+   and vanishes over light text — "covers nothing, connects everything".
+   ============================================================ */
+
+.life-thread-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* height set in JS = document.body.scrollHeight */
+  pointer-events: none;
+  z-index: 5;
+  overflow: visible;
+  mix-blend-mode: screen;
+  transition: opacity 1s var(--ease-enter);
+}
+
+.life-thread-wrap.is-dim { opacity: 0; }
+
+.life-thread-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.life-thread-path {
+  fill: none;
+  stroke: var(--c-camera);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.32;  /* dimmer trail — the bright head carries the action */
+  will-change: stroke-dashoffset;
+}
+
+/* The traveling head — a fixed-positioned glowing dot, positioned every
+   frame by JS via translate3d. Decoupled from the scroll compositor so
+   there's zero lag between scroll and the gold glow. Pre-baked drop-shadow
+   (no animated filter — animating filter creates a compositing layer that
+   itself can lag). */
+.life-thread-head-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    oklch(0.97 0.120 75) 0%,
+    oklch(0.88 0.150 75) 40%,
+    oklch(0.75 0.170 75 / 0.35) 80%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 14px oklch(0.88 0.150 75 / 0.85),
+    0 0 28px oklch(0.80 0.160 75 / 0.55);
+  transform: translate3d(-50px, -50px, 0);
+  pointer-events: none;
+  z-index: 6;
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-enter);
+}
+
+.life-thread-head-dot.is-visible { opacity: 1; }
+
+.life-thread-node {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  transform: translate(-50%, -50%) scale(0.7);
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.9s var(--ease-enter),
+    transform 0.9s var(--ease-enter);
+}
+
+.life-thread-node.lit {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.life-thread-node__halo {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid;
+  opacity: 0.45;
+  animation: lt-halo-pulse 3.6s ease-in-out infinite;
+}
+
+.life-thread-node__dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 18px currentColor;
+}
+
+.life-thread-node--soccer .life-thread-node__halo { border-color: var(--c-soccer); }
+.life-thread-node--soccer .life-thread-node__dot  { background: var(--c-soccer); color: var(--c-soccer); }
+.life-thread-node--camera .life-thread-node__halo { border-color: var(--c-camera); }
+.life-thread-node--camera .life-thread-node__dot  { background: var(--c-camera); color: var(--c-camera); }
+.life-thread-node--ai     .life-thread-node__halo { border-color: var(--c-ai); }
+.life-thread-node--ai     .life-thread-node__dot  { background: var(--c-ai); color: var(--c-ai); }
+.life-thread-node--jaz    .life-thread-node__halo { border-color: var(--c-jaz); }
+.life-thread-node--jaz    .life-thread-node__dot  { background: var(--c-jaz); color: var(--c-jaz); }
+
+@keyframes lt-halo-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.45; }
+  50%      { transform: scale(1.15); opacity: 0.2; }
+}
+
+/* Raise scene content above the thread so text & titles read first */
+.scene__layout { z-index: 10; }
+
+/* Demote the old side spine to a micro scroll-progress breadcrumb.
+   The life thread carries narrative; the spine just confirms position. */
+.through-line {
+  width: 4px;
+  left: clamp(10px, 1.6vw, 22px);
+  opacity: 0.55;
+}
+.through-line__base      { left: 1.5px; }
+.through-line__progress  { left: 1px; width: 1.5px; }
+.through-line__head {
+  width: 4px;
+  height: 4px;
+  left: 0;
+  box-shadow: 0 0 8px var(--fg);
+}
+.through-line .segment { display: none; }
+
+@media (max-width: 768px) {
+  .life-thread-wrap { opacity: 0.5; }
+  .life-thread-node { width: 36px; height: 36px; }
+  .life-thread-node__halo { width: 32px; height: 32px; }
+  .life-thread-node__dot  { width: 8px;  height: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .life-thread-path { stroke-dashoffset: 0 !important; }
+  .life-thread-node { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .life-thread-node__halo { animation: none; }
 }
