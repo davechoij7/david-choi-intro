@@ -125,19 +125,6 @@ document.querySelectorAll('.scene:not([data-choreographed])').forEach((scene) =>
     });
   });
 
-  // Hide the thread during scene 11 (the abstract convergence moment)
-  const scene11 = document.getElementById('scene-11');
-  if (scene11) {
-    ScrollTrigger.create({
-      trigger: scene11,
-      start: 'top 60%',
-      end: 'bottom 20%',
-      onEnter:     () => thread.classList.add('is-hidden'),
-      onLeave:     () => thread.classList.remove('is-hidden'),
-      onEnterBack: () => thread.classList.add('is-hidden'),
-      onLeaveBack: () => thread.classList.remove('is-hidden'),
-    });
-  }
 })();
 
 /* ============================================================
@@ -167,8 +154,7 @@ document.querySelectorAll('.scene:not([data-choreographed])').forEach((scene) =>
   // Per-scene X lane (0–100, % of viewport).
   // Default: ride the right side (80–84). Move only when content demands it —
   // two deliberate lateral moves (scene 03 + scene 08) register as motivated,
-  // not random. Thread terminates at scene 11's TOP (hands off to the 3-arc
-  // split). No waypoint for scene 12.
+  // not random. Thread terminates at scene-12 (the closer list).
   const LANES = {
     'scene-01': 82,
     'scene-02': 80,
@@ -180,13 +166,11 @@ document.querySelectorAll('.scene:not([data-choreographed])').forEach((scene) =>
     'scene-08': 88,
     'scene-09': 82,
     'scene-10': 82,
-    'scene-11': 50,   // TERMINAL — y = scene.offsetTop, not midY
+    'scene-12': 50,   // TERMINAL
   };
 
   let pathLen = 0;
   const waypoints = [];
-  let s11Top = 0;
-  let s11Bottom = 0;
 
   // Monotonic (docY, x, arc) triplets sampled along the path. Lets us ask
   // "what path point corresponds to document-y Y?" in ~log(n). Required
@@ -219,19 +203,8 @@ document.querySelectorAll('.scene:not([data-choreographed])').forEach((scene) =>
     // traversal agree exactly.
     svg.setAttribute('viewBox', `0 0 ${vw} ${totalH}`);
 
-    const s11 = document.getElementById('scene-11');
-    s11Top    = s11 ? docTopOf(s11) : totalH;
-    s11Bottom = s11 ? docTopOf(s11) + s11.offsetHeight : totalH;
-
-    // Compute waypoints. Every scene (including scene-11) uses its MIDDLE.
-    // Why scene-11 middle and not top: the 3-arc threads are
-    //   d="M 600 0 C ... 600 400"  viewBox="0 0 1200 800"  slice
-    // — they emanate from top-center (M 600 0) and CONVERGE at (600, 400)
-    // = scene-11 center. The visible handoff point is the convergence
-    // (the .knot), not the emanation origin. Scene-11 is 100vh tall and
-    // pins at its top — so when pinned, scene-11 middle sits at viewport
-    // middle, which is exactly where the dot already lives. No ramp, no
-    // special case. Scene 12 is skipped (no waypoint).
+    // Compute waypoints. Every scene with a LANES entry uses its MIDDLE.
+    // Scene-12 is the terminal — line ends at its center.
     waypoints.length = 0;
     scenes.forEach((scene) => {
       const id   = scene.id;
@@ -258,7 +231,7 @@ document.querySelectorAll('.scene:not([data-choreographed])').forEach((scene) =>
       const currXpx = (curr.x * k).toFixed(2);
       d += ` C ${prevXpx} ${midY.toFixed(2)}, ${currXpx} ${midY.toFixed(2)}, ${currXpx} ${curr.y.toFixed(2)}`;
     }
-    // NO line extension past last waypoint — path ends at scene-11 top.
+    // NO line extension past last waypoint — path ends at scene-12 center.
 
     path.setAttribute('d', d);
     pathLen = path.getTotalLength();
@@ -350,21 +323,13 @@ document.querySelectorAll('.scene:not([data-choreographed])').forEach((scene) =>
     };
   }
 
-  // Scroll scrub. Ends at scene-11 TOP (the moment scene-11 pins).
-  //
-  // Terminal geometry: the last waypoint is at scene-11 middle (y =
-  // s11Top + vh/2). At the pin moment (scrollY = s11Top), targetY =
-  // scrollY + vh/2 = s11Top + vh/2 = last waypoint. Line fills exactly.
-  // In screen coords, that point sits at viewport middle — right where
-  // the .knot lives (scene-11 threads converge at viewBox 600,400 =
-  // scene-11 center). The dot fades out and the 3 arcs emerge from
-  // top-center, converging on that same point.
+  // Scroll scrub. Ends at scene-12 middle (the closer list — the terminal).
   //
   // IMPLEMENTATION NOTE: we DO NOT drive the dot by self.progress * pathLen.
   // The path's arc length is ~33% longer than the scroll range because lateral
   // bezier sweeps (scene-02 → scene-03 swings x 80→15, back 15→82) add arc
   // length with no scroll counterpart. Driving by progress makes the dot
-  // outpace scroll, drifting past viewport bottom around obsession 01.
+  // outpace scroll, drifting past viewport bottom around the soccer beat.
   //
   // Instead, map directly from document-space Y (scrollY + vh/2, i.e. viewport
   // middle) to path (x, arc) via the sampled lookup. This decouples the dot's
@@ -372,14 +337,11 @@ document.querySelectorAll('.scene:not([data-choreographed])').forEach((scene) =>
   ScrollTrigger.create({
     trigger: document.documentElement,
     start: 'top top',
-    // Function-valued end + refreshPriority:-1 so this ST refreshes AFTER
-    // the pinned scenes (03, 08) insert their pin-spacers. Without the low
-    // priority, end resolves to scene-11's pre-spacer position (~8kpx) and
-    // the dot freezes ~2-3kpx before scene-11 actually pins. With it, end
-    // resolves to the true post-layout position (~11kpx).
     end: () => {
-      const s11 = document.getElementById('scene-11');
-      return s11 ? s11.getBoundingClientRect().top + window.scrollY : 'max';
+      const s12 = document.getElementById('scene-12');
+      if (!s12) return 'max';
+      const r = s12.getBoundingClientRect();
+      return r.top + window.scrollY + s12.offsetHeight * 0.5;
     },
     invalidateOnRefresh: true,
     refreshPriority: -1,
@@ -424,18 +386,12 @@ document.querySelectorAll('.scene:not([data-choreographed])').forEach((scene) =>
   });
 
   // Head dot visibility — visible once the user starts scrolling (past scene-01
-  // intro beat), fades out as scene-11 pinned phase takes over.
+  // intro beat). Stays visible all the way to the closer.
   ScrollTrigger.create({
     trigger: '#scene-02',
     start: 'top 80%',
     onEnter:     () => headDot.classList.add('is-visible'),
     onLeaveBack: () => headDot.classList.remove('is-visible'),
-  });
-  ScrollTrigger.create({
-    trigger: '#scene-11',
-    start: 'top top',          // fade exactly when scene-11 pins — 3-arc takes over then
-    onEnter:     () => headDot.classList.remove('is-visible'),
-    onLeaveBack: () => headDot.classList.add('is-visible'),
   });
 
   // Ignite each node as its scene enters (Jaz node is hidden — no scene-10 waypoint lookup fails gracefully, handled in build())
@@ -602,245 +558,6 @@ document.querySelectorAll('.scene:not([data-choreographed])').forEach((scene) =>
       else ticker.classList.remove('is-beat');
     }, null, pos);
   });
-})();
-
-/* ------------------------------------------------------------
-   NeuralBlast — canvas-rendered node/edge graph for the finale.
-   Seeds ~42 nodes across 3 radial shells with short-range edges.
-   Scroll progress drives radial spread (nodes fan out from
-   center); local time drives synaptic pulsing on nodes + edges.
-   Must be declared before the scene 11 IIFE that instantiates it
-   (class declarations are not hoisted like function declarations).
-   ------------------------------------------------------------ */
-class NeuralBlast {
-  constructor(canvas) {
-    this.canvas = canvas;
-    this.ctx    = canvas.getContext('2d');
-    this.nodes  = [];
-    this.edges  = [];
-    this.progress = 0;
-    this.time   = 0;
-    this.lastT  = 0;
-
-    this._resize = this._resize.bind(this);
-    this._loop   = this._loop.bind(this);
-    window.addEventListener('resize', this._resize);
-    this._resize();
-    this._seed();
-    requestAnimationFrame(this._loop);
-  }
-
-  _resize() {
-    const rect = this.canvas.getBoundingClientRect();
-    const dpr  = window.devicePixelRatio || 1;
-    this.canvas.width  = Math.max(1, rect.width  * dpr);
-    this.canvas.height = Math.max(1, rect.height * dpr);
-    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    this.w  = rect.width;
-    this.h  = rect.height;
-    this.cx = this.w / 2;
-    this.cy = this.h / 2;
-  }
-
-  _seed() {
-    // Store radii as a fraction of the viewport (0..1) so resize scales
-    // the net automatically. Multiplied by rScale at draw time.
-    const NUM = 260;
-    const SHELLS = 7;
-    const per = NUM / SHELLS;
-    for (let i = 0; i < NUM; i++) {
-      const shell   = Math.floor(i / per);             // 0..SHELLS-1
-      const shellT  = shell / (SHELLS - 1);            // 0..1 across shells
-      const angle   = (i / NUM) * Math.PI * 2 + (Math.random() - 0.5) * 0.45;
-      // baseR fraction: inner shell ~0.08, outer shell ~1.05, with jitter.
-      const baseR   = 0.08 + shellT * 0.95 + Math.random() * 0.1;
-      const isAI    = Math.random() < 0.22;            // ~22% blue accents
-      this.nodes.push({
-        angle,
-        baseR,                                         // fraction of rScale
-        color: isAI ? 'ai' : 'amber',
-        firePhase: Math.random() * Math.PI * 2,
-        fireSpeed: 1.8 + Math.random() * 1.8,
-      });
-    }
-    // Connect each node to its 5–8 nearest neighbours — a proper mesh.
-    for (let i = 0; i < this.nodes.length; i++) {
-      const candidates = [];
-      for (let j = 0; j < this.nodes.length; j++) {
-        if (i === j) continue;
-        const a = this.nodes[i], b = this.nodes[j];
-        let da = Math.abs(a.angle - b.angle);
-        if (da > Math.PI) da = Math.PI * 2 - da;
-        const dr = Math.abs(a.baseR - b.baseR);
-        const dist = da * 1.0 + dr * 0.9;              // weighted
-        candidates.push({ j, dist });
-      }
-      candidates.sort((a, b) => a.dist - b.dist);
-      const count = 5 + Math.floor(Math.random() * 4); // 5..8
-      for (let k = 0; k < count; k++) {
-        const j = candidates[k].j;
-        if (j > i) {
-          this.edges.push({ a: i, b: j, phase: Math.random() * Math.PI * 2 });
-        }
-      }
-    }
-    // Plus a sprinkle of long-range "backbone" edges that cross the graph.
-    // Picks ~10% of nodes at random and wires them to something roughly
-    // opposite — gives the net big visible spanning signal paths.
-    const backboneCount = Math.floor(NUM * 0.12);
-    for (let k = 0; k < backboneCount; k++) {
-      const i = Math.floor(Math.random() * NUM);
-      const jCandidate = (i + NUM / 2 + Math.floor((Math.random() - 0.5) * NUM * 0.35)) % NUM;
-      const j = Math.max(0, Math.min(NUM - 1, Math.floor(jCandidate)));
-      if (i !== j) {
-        const lo = Math.min(i, j), hi = Math.max(i, j);
-        this.edges.push({ a: lo, b: hi, phase: Math.random() * Math.PI * 2 });
-      }
-    }
-  }
-
-  setProgress(p) { this.progress = p; }
-
-  _loop(t) {
-    if (!this.lastT) this.lastT = t;
-    this.time += (t - this.lastT) / 1000;
-    this.lastT = t;
-    this._draw();
-    requestAnimationFrame(this._loop);
-  }
-
-  _draw() {
-    const ctx = this.ctx;
-    ctx.clearRect(0, 0, this.w, this.h);
-
-    // Blast is active between scroll progress ~0.55 and ~0.80 of the pinned
-    // section (timeline 2.2–3.2 on a ~3.6 total). Map to local 0→1.
-    const bp = Math.max(0, Math.min(1, (this.progress - 0.55) / 0.25));
-    if (bp <= 0) return;
-
-    const spread = 1 - Math.pow(1 - bp, 3);            // easeOutCubic
-
-    // Scale outer shell to roughly reach the corners — feels like the net
-    // fills (and overflows) the viewport. Using max(w,h) * 0.62 so the
-    // farthest nodes extend slightly beyond the short edge, giving the
-    // graph an "explodes past the frame" sensation.
-    const rScale = Math.max(this.w, this.h) * 0.62;
-
-    // Pre-compute node positions so edges can reference them.
-    const pos = this.nodes.map(n => {
-      const r = n.baseR * rScale * spread;
-      return {
-        x: this.cx + Math.cos(n.angle) * r,
-        y: this.cy + Math.sin(n.angle) * r,
-      };
-    });
-
-    // Edges — thin pulsing lines between connected nodes.
-    ctx.lineWidth = 1.25;
-    for (const e of this.edges) {
-      const a = pos[e.a], b = pos[e.b];
-      const pulse = 0.25 + 0.25 * Math.sin(this.time * 2.2 + e.phase);
-      ctx.strokeStyle = `oklch(0.78 0.09 75 / ${(pulse * spread).toFixed(3)})`;
-      ctx.beginPath();
-      ctx.moveTo(a.x, a.y);
-      ctx.lineTo(b.x, b.y);
-      ctx.stroke();
-    }
-
-    // Nodes — pulsing dots, with AI-blue accents scattered in.
-    for (let i = 0; i < this.nodes.length; i++) {
-      const n = this.nodes[i], p = pos[i];
-      const pulse = 0.55 + 0.45 * Math.sin(this.time * n.fireSpeed + n.firePhase);
-      const r = (2.8 + pulse * 3.2) * (0.6 + 0.4 * spread);
-      const alpha = (0.55 + 0.45 * pulse) * (0.5 + 0.5 * spread);
-      const color = n.color === 'ai'
-        ? `oklch(0.78 0.14 240 / ${alpha.toFixed(3)})`
-        : `oklch(0.86 0.15 75 / ${alpha.toFixed(3)})`;
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-}
-
-/* ============================================================
-   SCENE 11 — 3-thread split → converge → neural blast → map
-   The pinned finale. Life thread hands off to 3 obsession arcs
-   (soccer / edit / AI) that split from top-center, curve out to
-   their apex, then converge into a single knot. The knot detonates
-   into a neural net (canvas), which collapses into a world map
-   tracing Seoul → ATL → LA → NY → SD.
-   ============================================================ */
-
-(function sceneEleven() {
-  const scene11 = document.getElementById('scene-11');
-  if (!scene11) return;
-
-  const threads   = scene11.querySelectorAll('.thread');
-  const labels    = scene11.querySelectorAll('.thread-label');
-  const knot      = scene11.querySelector('.knot');
-  const canvas    = scene11.querySelector('.neural-blast');
-  const mapLayer  = scene11.querySelector('.map-layer');
-  const mapRoute  = scene11.querySelector('.map-route');
-  const mapCities = scene11.querySelectorAll('.map-city');
-
-  // Seed each thread's dasharray to its own path length so the draw
-  // progresses cleanly from start→apex→knot as dashoffset decreases.
-  threads.forEach(path => {
-    const len = path.getTotalLength();
-    path.style.strokeDasharray = len;
-    path.style.strokeDashoffset = len;
-  });
-
-  // Map route dashed length (for the dotted path to draw in sequence).
-  if (mapRoute) {
-    const len = mapRoute.getTotalLength();
-    mapRoute.style.strokeDasharray = `${len}`;
-    mapRoute.style.strokeDashoffset = len;
-  }
-
-  // Boot the neural blast; it'll read progress from ScrollTrigger.
-  const blast = new NeuralBlast(canvas);
-
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: scene11,
-      start: 'top top',
-      end: '+=400%',
-      scrub: 1,
-      pin: true,
-      anticipatePin: 1,
-      onUpdate: (self) => blast.setProgress(self.progress),
-    },
-  });
-
-  // ---- Phase A (0.0–1.8): split + draw ----
-  // Threads draw fully from top-center out to apex and back to the knot.
-  tl.to(threads, {
-    strokeDashoffset: 0,
-    duration: 1.8,
-    ease: 'power2.inOut',
-    stagger: 0.12,
-  }, 0);
-  // Labels flash at apex (mid-draw).
-  tl.to(labels, { opacity: 1, duration: 0.35, stagger: 0.08 }, 0.75)
-    .to(labels, { opacity: 0, duration: 0.35 }, 1.75);
-
-  // ---- Phase B (1.8–2.2): knot lights up ----
-  tl.to(knot, { scale: 1, duration: 0.35, ease: easeEnter }, 1.85);
-
-  // ---- Phase C (2.2–3.2): neural blast ----
-  // Threads dim so the blast dominates; knot fades into the blast.
-  tl.to(canvas,  { opacity: 1, duration: 0.4 }, 2.15);
-  tl.to(threads, { opacity: 0.12, duration: 0.5 }, 2.2);
-  tl.to(knot,    { opacity: 0, duration: 0.4 }, 2.35);
-
-  // ---- Phase D (3.2–4.0): map reveal ----
-  tl.to(canvas,   { opacity: 0, duration: 0.5 }, 3.1);
-  tl.to(mapLayer, { opacity: 1, duration: 0.4 }, 3.2);
-  tl.to(mapRoute, { strokeDashoffset: 0, duration: 1.0, ease: 'power1.inOut' }, 3.3);
-  tl.to(mapCities, { opacity: 1, duration: 0.25, stagger: 0.12 }, 3.35);
 })();
 
 /* ============================================================

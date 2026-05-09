@@ -409,6 +409,22 @@ body { overscroll-behavior: none; }
   text-transform: uppercase;
 }
 
+.video-pair {
+  width: 100%;
+  max-width: 1200px;
+  margin: var(--s-5) auto 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-3);
+}
+.video-pair .video-frame {
+  margin: 0;
+  max-width: none;
+}
+@media (max-width: 720px) {
+  .video-pair { grid-template-columns: 1fr; }
+}
+
 /* ------------------------------------------------------------
    Ticker (scene 07)
    ------------------------------------------------------------ */
