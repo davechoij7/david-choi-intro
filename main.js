@@ -26,13 +26,33 @@ document.querySelectorAll('[data-bg]').forEach((el) => {
   if (!url) return;
   const img = new Image();
   img.onload = () => {
-    el.style.backgroundImage = `url('${url}')`;
+    el.style.backgroundImage = `url('${encodeURI(url)}')`;
     // crossfade layers and split media handle their own visibility
     if (el.classList.contains('scene__bg')) {
       el.style.opacity = '0'; // revealed by scene 01 timeline or default fade
     }
   };
   img.src = url;
+});
+
+/* --- Videos: hydrate [data-video] divs with autoplay-muted-loop <video>.
+   Only attempts play when the file actually loads — keeps placeholder
+   text visible if the asset is missing. --- */
+document.querySelectorAll('[data-video]').forEach((el) => {
+  const url = el.dataset.video;
+  if (!url) return;
+  const v = document.createElement('video');
+  v.src = encodeURI(url);
+  v.muted = true;
+  v.loop = true;
+  v.playsInline = true;
+  v.autoplay = true;
+  v.preload = 'auto';
+  v.addEventListener('loadeddata', () => {
+    el.classList.add('has-video');
+    v.play().catch(() => {}); // some browsers reject autoplay; ignore
+  });
+  el.appendChild(v);
 });
 
 /* --- Default editorial fade for scenes without custom choreography --- */
@@ -427,7 +447,8 @@ document.querySelectorAll('.scene:not([data-choreographed])').forEach((scene) =>
   const aLabel  = s01.querySelector('.map-01__city--atl .map-01__label');
   const aSub    = s01.querySelector('.map-01__city--atl .map-01__sub');
   const aHalo   = s01.querySelector('.map-01__city--atl .map-01__halo');
-  const bg      = s01.querySelector('.scene__bg');
+  const bg1     = s01.querySelector('.scene__bg--first');   // Dad-Baby (Seoul beat)
+  const bg2     = s01.querySelector('.scene__bg--second');  // korea-family (transition)
   const title   = s01.querySelector('.display');
   const lede    = s01.querySelector('.lede');
   const mark    = s01.querySelector('.mark');
@@ -436,7 +457,8 @@ document.querySelectorAll('.scene:not([data-choreographed])').forEach((scene) =>
   // Initial states
   gsap.set(layout, { opacity: 1 });
   gsap.set([mark, title, lede], { opacity: 0, y: 32 });
-  if (bg) gsap.set(bg, { opacity: 0 });
+  if (bg1) gsap.set(bg1, { opacity: 0 });
+  if (bg2) gsap.set(bg2, { opacity: 0 });
 
   // ViewBox waypoints: (x, y, w, h)
   const seoulView = '1150 300 400 240';   // tight on Seoul
@@ -473,7 +495,11 @@ document.querySelectorAll('.scene:not([data-choreographed])').forEach((scene) =>
   tl.to(aHalo,  { opacity: 0.7, attr: { r: 70 }, duration: 0.5 }, 2.9);
   tl.to(aHalo,  { opacity: 0,   attr: { r: 48 }, duration: 0.4 }, 3.4);
 
-  if (bg) tl.to(bg, { opacity: 0.8, duration: 0.9 }, 2.9);
+  // Phase A: Dad-Baby fades in alongside Seoul map
+  if (bg1) tl.to(bg1, { opacity: 0.85, duration: 0.8 }, 0.4);
+  // Phase C: crossfade Dad-Baby → korea-family as the route arrives in Atlanta
+  if (bg1) tl.to(bg1, { opacity: 0,    duration: 0.9 }, 2.9);
+  if (bg2) tl.to(bg2, { opacity: 0.85, duration: 0.9 }, 2.9);
   tl.add(() => s01.classList.add('is-map-fading'), 3.0);
   tl.add(() => s01.classList.remove('is-map-fading'), '<-=0.01'); // no-op balance; class applied by timeline direction via callback
 

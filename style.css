@@ -302,6 +302,93 @@ body { overscroll-behavior: none; }
   font-variation-settings: 'opsz' 40, 'SOFT' 50;
 }
 
+/* Polaroid base — used as decorative overlays in scenes 01, 02, 09 */
+.scene__inset,
+.choi-polaroid {
+  position: absolute;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--bg-soft);
+  border: 8px solid oklch(0.96 0.012 80 / 0.95);
+  box-shadow: 0 14px 44px -10px oklch(0 0 0 / 0.55);
+  z-index: 2;
+}
+
+/* Scene 09 — two polaroids stacked in the upper-right (armanlake + hsgrad) */
+.scene__inset--armanlake {
+  top: 9vh; right: 6vw;
+  width: 18vw; max-width: 240px;
+  aspect-ratio: 4/5;
+  transform: rotate(3deg);
+  z-index: 3;
+}
+.scene__inset--hsgrad {
+  top: 36vh; right: 14vw;
+  width: 18vw; max-width: 240px;
+  aspect-ratio: 4/5;
+  transform: rotate(-4deg);
+  z-index: 2;
+}
+
+/* Scene 02 — three polaroids scattered in the right margin around the Chois list */
+.choi-polaroid {
+  width: 17vw; max-width: 240px;
+  aspect-ratio: 4/5;
+}
+.choi-polaroid--1 { top: 10vh; right: 8vw;  transform: rotate(3deg);  }
+.choi-polaroid--2 { top: 36vh; right: 22vw; transform: rotate(-4deg); }
+.choi-polaroid--3 { top: 62vh; right: 6vw;  transform: rotate(2deg);  }
+
+@media (max-width: 720px) {
+  .scene__inset--armanlake { width: 32vw; top: 4vh; right: 4vw; }
+  .scene__inset--hsgrad    { width: 32vw; top: 22vh; right: 12vw; }
+  .choi-polaroid           { display: none; }
+}
+
+/* Scene 10 — jaz polaroid stack, 4-up row with full photos (no cropping) */
+.scene__layout--jaz {
+  padding: 8vh 4vw;
+  place-content: center;
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  gap: var(--s-3);
+  text-align: center;
+}
+.scene__layout--jaz > .mark,
+.scene__layout--jaz > .display { justify-self: center; }
+.jaz-stack {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s-3);
+  align-items: center;
+  width: 100%;
+  max-width: 1500px;
+  margin: var(--s-3) auto;
+}
+.jaz-polaroid {
+  background: oklch(0.96 0.012 80 / 0.96);
+  padding: 10px 10px 32px;
+  box-shadow: 0 16px 50px -12px oklch(0 0 0 / 0.55);
+  display: block;
+}
+.jaz-polaroid img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.jaz-polaroid:nth-child(1) { transform: rotate(-3deg); }
+.jaz-polaroid:nth-child(2) { transform: rotate(2deg); }
+.jaz-polaroid:nth-child(3) { transform: rotate(-2deg); }
+.jaz-polaroid:nth-child(4) { transform: rotate(3deg); }
+@media (max-width: 900px) {
+  .jaz-stack {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 720px;
+    gap: var(--s-2);
+  }
+}
+
 /* ------------------------------------------------------------
    Scene-specific positioning
    ------------------------------------------------------------ */
@@ -407,6 +494,15 @@ body { overscroll-behavior: none; }
   letter-spacing: 0.2em;
   color: var(--fg-dim);
   text-transform: uppercase;
+}
+
+.video-frame.has-video::after { display: none; }
+.video-frame video,
+.split__media--video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .video-pair {

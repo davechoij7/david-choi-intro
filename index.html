@@ -76,7 +76,8 @@
          title bottom-left, subtitle offset. Editorial magazine cover.
          ========================================================= -->
     <section class="scene scene--bleed scene--01" id="scene-01" data-scene="01" data-choreographed="true">
-      <div class="scene__bg" data-bg="images/01-korea-david.jpg"></div>
+      <div class="scene__bg scene__bg--first"  data-bg="images/Dad-Baby.png"></div>
+      <div class="scene__bg scene__bg--second" data-bg="images/korea-family.png"></div>
       <div class="scene__vignette"></div>
       <div class="map-01" aria-hidden="true">
         <svg viewBox="1150 300 400 240" preserveAspectRatio="xMidYMid slice">
@@ -130,6 +131,9 @@
         </dl>
         <p class="aside">The overachiever gene skipped me.</p>
       </div>
+      <div class="choi-polaroid choi-polaroid--1" data-bg="images/early-family.png" aria-hidden="true"></div>
+      <div class="choi-polaroid choi-polaroid--2" data-bg="images/young-family.png" aria-hidden="true"></div>
+      <div class="choi-polaroid choi-polaroid--3" data-bg="images/Tasha-dog.png" aria-hidden="true"></div>
     </section>
 
     <!-- =========================================================
@@ -143,8 +147,8 @@
           <h2 class="display display--sm">Ball is Life.</h2>
         </div>
         <div class="split__media split__media--crossfade">
-          <div class="crossfade-layer crossfade-layer--young"   data-bg="images/03-young-mike-david.jpg"></div>
-          <div class="crossfade-layer crossfade-layer--present" data-bg="images/03-present-mike.jpg"></div>
+          <div class="crossfade-layer crossfade-layer--young"   data-bg="images/penaltykick.jpg"></div>
+          <div class="crossfade-layer crossfade-layer--present" data-bg="images/mikesoccer.jpg"></div>
           <span class="reveal-caption">I even played with this kid.</span>
         </div>
       </div>
@@ -159,8 +163,8 @@
         <span class="mark mark--camera">Thread 02 · The edit</span>
         <h2 class="display display--md">Making dumb videos<br/>with my friends.</h2>
         <div class="video-pair">
-          <div class="video-frame" data-video="images/04a-kid-videos.mp4"></div>
-          <div class="video-frame" data-video="images/04b-kid-videos.mp4"></div>
+          <div class="video-frame" data-video="images/pullup-funny.mov"></div>
+          <div class="video-frame" data-video="images/hair-college.mov"></div>
         </div>
       </div>
     </section>
@@ -171,13 +175,10 @@
          joke pops as hand-feeling caption over the photo.
          ========================================================= -->
     <section class="scene scene--05" id="scene-05" data-scene="05">
-      <div class="scene__layout scene__layout--asymmetric">
-        <div class="offset-left">
-          <span class="mark">2016 · UCLA</span>
-          <h2 class="display">Technology.</h2>
-          <p class="lede">West Coast focused.</p>
-        </div>
-        <div class="offset-right" data-bg="images/05-ucla-team.jpg"></div>
+      <div class="scene__layout scene__layout--column">
+        <span class="mark">2016 · UCLA</span>
+        <h2 class="display">Technology.</h2>
+        <p class="lede">West Coast focused.</p>
       </div>
     </section>
 
@@ -231,8 +232,10 @@
          Single line overlay bottom.
          ========================================================= -->
     <section class="scene scene--bleed scene--09" id="scene-09" data-scene="09">
-      <div class="scene__bg" data-bg="images/09-david-mike-present.jpg"></div>
+      <div class="scene__bg" data-bg="images/vietnam-mike.jpeg"></div>
       <div class="scene__vignette"></div>
+      <div class="scene__inset scene__inset--armanlake" data-bg="images/armanlake.jpg" aria-hidden="true"></div>
+      <div class="scene__inset scene__inset--hsgrad" data-bg="images/highschoolgraduation.jpg" aria-hidden="true"></div>
       <div class="scene__layout scene__layout--cover">
         <div class="stack stack--bottom-left">
           <span class="mark">2026 · back home</span>
@@ -246,14 +249,16 @@
          SCENE 10 — JAZ
          Layout: full-bleed photo. One word. Restraint.
          ========================================================= -->
-    <section class="scene scene--bleed scene--10" id="scene-10" data-scene="10">
-      <div class="scene__bg" data-bg="images/10-jaz.jpg"></div>
-      <div class="scene__vignette scene__vignette--soft"></div>
-      <div class="scene__layout scene__layout--cover">
-        <div class="stack stack--bottom-left">
-          <span class="mark mark--jaz">The fourth one is different.</span>
-          <h2 class="display">Jazmin.</h2>
+    <section class="scene scene--10" id="scene-10" data-scene="10">
+      <div class="scene__layout scene__layout--jaz">
+        <span class="mark mark--jaz">The fourth one is different.</span>
+        <div class="jaz-stack">
+          <div class="jaz-polaroid"><img src="images/jaz-face.png" alt=""></div>
+          <div class="jaz-polaroid"><img src="images/jaz-halloween-first.png" alt=""></div>
+          <div class="jaz-polaroid"><img src="images/jaz-halloween.jpeg" alt=""></div>
+          <div class="jaz-polaroid"><img src="images/jaz-mexico.JPG" alt=""></div>
         </div>
+        <h2 class="display">Jazmin.</h2>
       </div>
     </section>
 
