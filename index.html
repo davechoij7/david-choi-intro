@@ -57,7 +57,7 @@
     <div class="life-thread-node life-thread-node--camera" data-target="#scene-04">
       <span class="life-thread-node__halo"></span><span class="life-thread-node__dot"></span>
     </div>
-    <div class="life-thread-node life-thread-node--ai" data-target="#scene-07">
+    <div class="life-thread-node life-thread-node--ai" data-target="#scene-06">
       <span class="life-thread-node__halo"></span><span class="life-thread-node__dot"></span>
     </div>
     <div class="life-thread-node life-thread-node--jaz" data-target="#scene-10">
@@ -164,7 +164,7 @@
         <h2 class="display display--md">Making dumb videos<br/>with my friends.</h2>
         <div class="video-pair">
           <div class="video-frame" data-video="images/pullup-funny.mov"></div>
-          <div class="video-frame" data-video="images/hair-college.mov"></div>
+          <div class="video-frame" data-video="images/armanbball.mp4"></div>
         </div>
       </div>
     </section>
@@ -175,38 +175,45 @@
          joke pops as hand-feeling caption over the photo.
          ========================================================= -->
     <section class="scene scene--05" id="scene-05" data-scene="05">
-      <div class="scene__layout scene__layout--column">
-        <span class="mark">2016 · UCLA</span>
-        <h2 class="display">Technology.</h2>
-        <p class="lede">West Coast focused.</p>
+      <div class="scene__bg" data-bg="images/Roycehall.jpg" data-target-opacity="0.32"></div>
+      <div class="scene__vignette scene__vignette--soft"></div>
+      <div class="scene__layout scene__layout--split">
+        <div class="split__text">
+          <span class="mark mark--ai">Thread 03 · Technology</span>
+          <h2 class="display display--sm">Technology.</h2>
+          <p class="lede">West Coast focused.</p>
+        </div>
+        <div class="split__media split__media--video" data-video="images/hair-college.mov"></div>
       </div>
     </section>
 
     <!-- =========================================================
-         SCENE 06 — AI ACCIDENT I
-         Layout: editorial, dense type-only. Narrow left-aligned column.
+         SCENE 06 — TECHNOLOGY TIMELINE
+         Two beats connected by an arrow that signifies time passing:
+         2021 (first job, selling AI pre-ChatGPT) →
+         Nov 30, 2022 (ChatGPT drops at the investment office).
          ========================================================= -->
     <section class="scene scene--06" id="scene-06" data-scene="06">
-      <div class="scene__layout scene__layout--column">
-        <span class="mark mark--ai">2021 · first job</span>
-        <h2 class="display display--md">Selling AI.<br/>Pre-ChatGPT.</h2>
-        <p class="lede">Imagine trying to sell people AI in 2021.</p>
-        <p class="aside">I walked so you all could run.</p>
-      </div>
-    </section>
-
-    <!-- =========================================================
-         SCENE 07 — AI ACCIDENT II: ChatGPT drops
-         Layout: timeline ticker. Beat-drop moment.
-         ========================================================= -->
-    <section class="scene scene--07" id="scene-07" data-scene="07">
-      <div class="scene__layout scene__layout--center-wide">
-        <div class="ticker" data-years="2020,2021,2022,Nov 30 · 2022">
-          <span class="ticker__value">2020</span>
+      <div class="scene__bg" data-bg-video="images/AIVisual.mp4" data-target-opacity="0.55"></div>
+      <div class="scene__vignette"></div>
+      <div class="scene__layout scene__layout--column scene__layout--timeline">
+        <div class="beat">
+          <span class="mark mark--ai">2021 · first job</span>
+          <h2 class="display display--md">Selling AI.<br/>Pre-ChatGPT.</h2>
+          <p class="lede">Imagine trying to sell people AI in 2021.</p>
+          <p class="aside">I walked so you all could run.</p>
         </div>
-        <h2 class="display">ChatGPT drops.</h2>
-        <p class="lede">I was at an investment office, modeling with it<br/>before anyone else on my floor.</p>
-        <p class="aside">That's when I realized I'd been early to something by accident.</p>
+
+        <div class="beat-arrow" aria-hidden="true">
+          <span class="beat-arrow__rule"></span>
+        </div>
+
+        <div class="beat">
+          <span class="mark mark--ai">Nov 30 · 2022</span>
+          <h2 class="display display--md">ChatGPT drops.</h2>
+          <p class="lede">I was at an investment office, modeling with it<br/>before anyone else on my floor.</p>
+          <p class="aside">That's when I realized I'd been early to something by accident.</p>
+        </div>
       </div>
     </section>
 
@@ -232,10 +239,10 @@
          Single line overlay bottom.
          ========================================================= -->
     <section class="scene scene--bleed scene--09" id="scene-09" data-scene="09">
-      <div class="scene__bg" data-bg="images/vietnam-mike.jpeg"></div>
+      <div class="scene__bg" data-bg="images/highschoolgraduation.jpg"></div>
       <div class="scene__vignette"></div>
       <div class="scene__inset scene__inset--armanlake" data-bg="images/armanlake.jpg" aria-hidden="true"></div>
-      <div class="scene__inset scene__inset--hsgrad" data-bg="images/highschoolgraduation.jpg" aria-hidden="true"></div>
+      <div class="scene__inset scene__inset--vietnam" data-bg="images/vietnam-mike.jpeg" aria-hidden="true"></div>
       <div class="scene__layout scene__layout--cover">
         <div class="stack stack--bottom-left">
           <span class="mark">2026 · back home</span>
@@ -267,7 +274,9 @@
          Layout: four obsessions stacked, left-aligned, huge.
          Closer line in serif italic below.
          ========================================================= -->
-    <section class="scene scene--12" id="scene-12" data-scene="12">
+    <section class="scene scene--bleed scene--12" id="scene-12" data-scene="12">
+      <div class="scene__bg" data-bg="images/LeapofFaith.jpg"></div>
+      <div class="scene__vignette"></div>
       <div class="scene__layout scene__layout--closer">
         <ul class="obsessions">
           <li><span class="obsessions__num">01</span>Soccer.</li>

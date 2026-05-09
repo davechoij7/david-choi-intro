@@ -96,6 +96,12 @@ body { overscroll-behavior: none; }
   transition: opacity 1.2s var(--ease-enter);
   z-index: 0;
 }
+.scene__bg > video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 
 .scene__vignette {
   position: absolute;
@@ -134,6 +140,55 @@ body { overscroll-behavior: none; }
   padding: 14vh 6vw 14vh 10vw;
   place-content: center start;
   max-width: min(720px, 92vw);
+}
+
+/* Stacked timeline beats: two .beat blocks separated by a .beat-arrow */
+.scene__layout--timeline {
+  gap: var(--s-3);
+}
+.beat {
+  display: grid;
+  gap: var(--s-2);
+}
+.beat-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-2);
+  margin: var(--s-3) 0 var(--s-3) 1rem;
+  color: var(--c-ai);
+}
+.beat-arrow__rule {
+  display: block;
+  width: 1px;
+  height: 60px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    currentColor 20%,
+    currentColor 80%,
+    transparent
+  );
+  position: relative;
+}
+.beat-arrow__rule:last-child::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: translateX(-50%) rotate(45deg);
+}
+.beat-arrow__label {
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: currentColor;
+  opacity: 0.6;
 }
 
 /* Split 2-col: text and media */
@@ -322,7 +377,7 @@ body { overscroll-behavior: none; }
   transform: rotate(3deg);
   z-index: 3;
 }
-.scene__inset--hsgrad {
+.scene__inset--vietnam {
   top: 36vh; right: 14vw;
   width: 18vw; max-width: 240px;
   aspect-ratio: 4/5;
@@ -341,7 +396,7 @@ body { overscroll-behavior: none; }
 
 @media (max-width: 720px) {
   .scene__inset--armanlake { width: 32vw; top: 4vh; right: 4vw; }
-  .scene__inset--hsgrad    { width: 32vw; top: 22vh; right: 12vw; }
+  .scene__inset--vietnam    { width: 32vw; top: 22vh; right: 12vw; }
   .choi-polaroid           { display: none; }
 }
 
@@ -475,6 +530,7 @@ body { overscroll-behavior: none; }
 .video-frame {
   width: 100%;
   max-width: 760px;
+  max-height: 80vh;
   aspect-ratio: 16/9;
   margin: var(--s-5) auto 0;
   background: var(--bg-soft);
@@ -482,6 +538,9 @@ body { overscroll-behavior: none; }
   overflow: hidden;
   border: 1px solid var(--rule);
 }
+/* Portrait videos: max-width should shrink with frame aspect so the frame
+   doesn't blow past viewport height. Browsers respect aspect-ratio + max-height
+   to derive an effective max-width. */
 
 .video-frame::after {
   content: 'kid-video · placeholder';
@@ -497,28 +556,41 @@ body { overscroll-behavior: none; }
 }
 
 .video-frame.has-video::after { display: none; }
-.video-frame video,
+.video-frame video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: var(--bg-soft);
+}
 .split__media--video video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
+  background: var(--bg-soft);
 }
 
+/* Center two videos side-by-side at their intrinsic sizes (driven by each
+   clip's aspect ratio + a shared max-height), instead of forcing equal
+   grid columns that leave dead space around portrait clips. */
 .video-pair {
   width: 100%;
-  max-width: 1200px;
   margin: var(--s-5) auto 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   gap: var(--s-3);
+  flex-wrap: wrap;
 }
 .video-pair .video-frame {
   margin: 0;
-  max-width: none;
+  max-width: 44vw;
+  max-height: 62vh;
+  flex: 0 0 auto;
 }
 @media (max-width: 720px) {
-  .video-pair { grid-template-columns: 1fr; }
+  .video-pair .video-frame { max-width: 90vw; max-height: 50vh; }
 }
 
 /* ------------------------------------------------------------

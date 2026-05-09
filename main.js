@@ -20,19 +20,56 @@ lenis.on('scroll', ScrollTrigger.update);
 gsap.ticker.add((time) => lenis.raf(time * 1000));
 gsap.ticker.lagSmoothing(0);
 
-/* --- Background images: load lazily, fade in only if the file exists --- */
+/* --- Background images: load lazily, fade in only if the file exists.
+   For .scene__bg in non-choreographed scenes, set up a ScrollTrigger to
+   fade the bg in on scene enter — otherwise it stays at the CSS-default
+   opacity:0 forever. Choreographed scenes (data-choreographed="true")
+   handle their own bg reveals via custom timelines. --- */
 document.querySelectorAll('[data-bg]').forEach((el) => {
   const url = el.dataset.bg;
   if (!url) return;
   const img = new Image();
   img.onload = () => {
     el.style.backgroundImage = `url('${encodeURI(url)}')`;
-    // crossfade layers and split media handle their own visibility
-    if (el.classList.contains('scene__bg')) {
-      el.style.opacity = '0'; // revealed by scene 01 timeline or default fade
-    }
+    if (!el.classList.contains('scene__bg')) return;
+    const scene = el.closest('.scene');
+    if (scene && scene.dataset.choreographed) return;
+    const target = el.dataset.targetOpacity || '0.9';
+    ScrollTrigger.create({
+      trigger: scene,
+      start: 'top 75%',
+      onEnter:     () => { el.style.opacity = target; },
+      onLeaveBack: () => { el.style.opacity = '0'; },
+    });
   };
   img.src = url;
+});
+
+/* --- Background videos: hydrate .scene__bg with [data-bg-video] into a
+   muted/looped <video>. Mirrors the [data-bg] image loader, including the
+   scroll-triggered fade-in for non-choreographed scenes. --- */
+document.querySelectorAll('[data-bg-video]').forEach((el) => {
+  const url = el.dataset.bgVideo;
+  if (!url) return;
+  const v = document.createElement('video');
+  v.src = encodeURI(url);
+  v.muted = true;
+  v.loop = true;
+  v.playsInline = true;
+  v.autoplay = true;
+  v.preload = 'auto';
+  v.addEventListener('loadeddata', () => v.play().catch(() => {}));
+  el.appendChild(v);
+  if (!el.classList.contains('scene__bg')) return;
+  const scene = el.closest('.scene');
+  if (scene && scene.dataset.choreographed) return;
+  const target = el.dataset.targetOpacity || '0.9';
+  ScrollTrigger.create({
+    trigger: scene,
+    start: 'top 75%',
+    onEnter:     () => { el.style.opacity = target; },
+    onLeaveBack: () => { el.style.opacity = '0'; },
+  });
 });
 
 /* --- Videos: hydrate [data-video] divs with autoplay-muted-loop <video>.
@@ -48,6 +85,13 @@ document.querySelectorAll('[data-video]').forEach((el) => {
   v.playsInline = true;
   v.autoplay = true;
   v.preload = 'auto';
+  v.addEventListener('loadedmetadata', () => {
+    // Match frame aspect-ratio to the video's native dimensions so portrait
+    // clips don't get center-cropped by the 16/9 placeholder frame.
+    if (v.videoWidth && v.videoHeight) {
+      el.style.aspectRatio = `${v.videoWidth} / ${v.videoHeight}`;
+    }
+  });
   v.addEventListener('loadeddata', () => {
     el.classList.add('has-video');
     v.play().catch(() => {}); // some browsers reject autoplay; ignore
@@ -58,7 +102,7 @@ document.querySelectorAll('[data-video]').forEach((el) => {
 /* --- Default editorial fade for scenes without custom choreography --- */
 document.querySelectorAll('.scene:not([data-choreographed])').forEach((scene) => {
   const targets = scene.querySelectorAll(
-    '.mark, .display, .lede, .aside, .editorial-list > div, .obsessions li, .closer, .video-frame, .reveal-caption, .ticker'
+    '.mark, .display, .lede, .aside, .editorial-list > div, .obsessions li, .closer, .video-frame, .reveal-caption, .beat-arrow'
   );
   if (!targets.length) return;
   gsap.from(targets, {
@@ -182,7 +226,6 @@ document.querySelectorAll('.scene:not([data-choreographed])').forEach((scene) =>
     'scene-04': 82,
     'scene-05': 48,
     'scene-06': 80,
-    'scene-07': 80,
     'scene-08': 88,
     'scene-09': 82,
     'scene-10': 82,
@@ -552,38 +595,6 @@ document.querySelectorAll('.scene:not([data-choreographed])').forEach((scene) =>
   tl.to({}, { duration: 0.6 });
   if (present) tl.to(present, { opacity: 1, duration: 1, ease: 'power2.inOut' }, 1.2);
   tl.to(caption, { opacity: 1, y: 0, duration: 0.5, ease: easeEnter }, 1.4);
-})();
-
-/* ============================================================
-   SCENE 07 — Year ticker with beat-drop emphasis
-   Steps: 2020 → 2021 → 2022 → Nov 30 · 2022
-   ============================================================ */
-
-(function sceneSeven() {
-  const ticker = document.querySelector('#scene-07 .ticker');
-  if (!ticker) return;
-  const years = (ticker.dataset.years || '').split(',').map((s) => s.trim());
-  const value = ticker.querySelector('.ticker__value');
-  if (!years.length || !value) return;
-
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: '#scene-07',
-      start: 'top 60%',
-      end: 'bottom 40%',
-      scrub: 1,
-    },
-  });
-
-  years.forEach((y, i) => {
-    const pos = i / Math.max(1, years.length - 1);
-    tl.call(() => {
-      if (value) value.textContent = y;
-      // Light the beat on the final tick
-      if (i === years.length - 1) ticker.classList.add('is-beat');
-      else ticker.classList.remove('is-beat');
-    }, null, pos);
-  });
 })();
 
 /* ============================================================
